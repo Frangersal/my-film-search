@@ -1,0 +1,149 @@
+/* Header */
+.fs-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px clamp(16px, 4vw, 36px);
+    background: linear-gradient(180deg, rgba(11, 13, 18, .85), rgba(11, 13, 18, .6) 70%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(120% 120% at 20% 20%, var(--accent-3), var(--accent-2) 60%, transparent 70%), var(--panel-strong);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    font-size: 22px;
+}
+
+.brand-title {
+    font-size: clamp(20px, 2.4vw, 28px);
+    letter-spacing: .4px;
+    background: linear-gradient(135deg, #fff, #c9ffd0 40%, #9fffb4 70%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 700;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.link {
+    color: var(--muted);
+    text-decoration: none;
+    padding: 8px 10px;
+    border-radius: 8px;
+    transition: color .2s ease, background-color .2s ease;
+}
+
+.link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, .06);
+}
+
+.cta {
+    color: #0b0d12;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 10px 20px rgba(108, 140, 255, .25);
+    transition: transform .15s ease, box-shadow .2s ease, filter .2s ease;
+}
+
+.cta:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+}
+
+.theme-toggle {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: background .2s ease, border-color .2s ease, transform .12s ease, color .2s ease;
+    --toggle-label-w: 64px; /* ancho reservado para el texto (ajustable) */
+    width: calc(var(--toggle-label-w) + 18px + 8px + 24px); /* label + icono + gap + padding */
+    justify-content: flex-start;
+}
+
+.theme-toggle:hover {
+    background: var(--panel-strong);
+    border-color: rgba(255,255,255,.28);
+    transform: translateY(-1px);
+}
+
+.toggle-icon {
+    width: 18px;
+    height: 18px;
+    color: currentColor;
+    flex-shrink: 0;
+}
+
+.toggle-label {
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-block;
+    white-space: nowrap;
+    flex: 0 0 var(--toggle-label-w);
+    text-align: center;
+
+}
+
+/* Ajustes sutiles en claro para hover del link del header */
+.theme-light .link {
+    color: var(--text); /* mantiene texto oscuro en claro */
+}
+.theme-light .link:hover,
+.theme-light .link:focus-visible {
+    color: var(--text); /* no cambia a blanco en hover */
+    background: rgba(0, 0, 0, .05);
+}
+
+/* Modo claro: header más limpio y luminoso */
+.theme-light .fs-header {
+    background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.78) 70%, rgba(255,255,255,0));
+    border-bottom: 1px solid rgba(0,0,0,.08);
+    backdrop-filter: blur(8px);
+}
+
+/* Título con mejor contraste en claro */
+.theme-light .brand-title {
+    background: linear-gradient(135deg, #0b0d12, #2f3a4e 40%, #43536d 70%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Logo más sutil en claro */
+.theme-light .logo {
+    background: radial-gradient(120% 120% at 20% 20%, rgba(0,209,255,.18), rgba(122,92,255,.18) 60%, transparent 70%), var(--panel-strong);
+    border-color: rgba(0,0,0,.12);
+}
