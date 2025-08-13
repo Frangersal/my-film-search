@@ -11,7 +11,7 @@ function Header({ isNavOpen, setIsNavOpen, isLight, setIsLight }) {
                     <div className="logo" aria-hidden="true">
                         <img src={movielogo} alt="" />
                     </div>
-                    <h1 className="brand-title">Film Search</h1>
+                    <h1 className="brand-title">My Film Search</h1>
                 </div>
 
                 <button
