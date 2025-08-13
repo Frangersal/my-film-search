@@ -10,6 +10,7 @@ function Header() {
     const [isLight, setIsLight] = useState(() => {
         return localStorage.getItem('theme') === 'light'
     })
+    const [isNavOpen, setIsNavOpen] = useState(false)
 
     useEffect(() => {
         const root = document.documentElement
@@ -22,6 +23,13 @@ function Header() {
         }
     }, [isLight])
 
+    // Cerrar el menú al ampliar pantalla
+    useEffect(() => {
+        const onResize = () => { if (window.innerWidth > 700) setIsNavOpen(false) }
+        window.addEventListener('resize', onResize)
+        return () => window.removeEventListener('resize', onResize)
+    }, [])
+
     return (
         <>
             <header className="fs-header">
@@ -31,7 +39,33 @@ function Header() {
                     </div>
                     <h1 className="brand-title">Film Search</h1>
                 </div>
-                <nav className="header-actions" aria-label="Atajos">
+
+                {/* Botón de menú (visible solo en móvil vía CSS) */}
+                <button
+                    type="button"
+                    className="menu-toggle"
+                    aria-expanded={isNavOpen}
+                    aria-controls="primary-nav"
+                    onClick={() => setIsNavOpen(o => !o)}
+                    title="Menú"
+                >
+                    {isNavOpen ? (
+                        <svg className="menu-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="currentColor" d="M18.3 5.71L12 12l6.3 6.29-1.41 1.42L10.59 13.4 4.29 19.71 2.88 18.3 9.17 12 2.88 5.71 4.29 4.29 10.59 10.6l6.3-6.31z" />
+                        </svg>
+                    ) : (
+                        <svg className="menu-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="currentColor" d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z" />
+                        </svg>
+                    )}
+                </button>
+
+                <nav
+                    id="primary-nav"
+                    className={`header-actions ${isNavOpen ? 'open' : ''}`}
+                    aria-label="Atajos"
+                    onClick={(e) => { if (e.target.tagName === 'A') setIsNavOpen(false) }}
+                >
                     <a href="#tendencias" className="link">Tendencias</a>
                     <a href="#mejor-valoradas" className="link">Mejor valoradas</a>
                     <a href="https://github.com" className="cta" target="_blank" rel="noreferrer">Repositorio</a>
