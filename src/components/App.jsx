@@ -1,13 +1,47 @@
-
+import { useEffect, useState } from 'react'
 import Header from './Header'
+import MenuMobile from './MenuMobile' 
+import Footer from './Footer' 
 import './style/App.css'
 import './style/index.css'
 
 function App() {
+  const [isNavOpen, setIsNavOpen] = useState(false)
+  const [isLight, setIsLight] = useState(() => localStorage.getItem('theme') === 'light')
+
+  useEffect(() => {
+    const root = document.documentElement
+    if (isLight) {
+      root.classList.add('theme-light')
+      localStorage.setItem('theme', 'light')
+    } else {
+      root.classList.remove('theme-light')
+      localStorage.setItem('theme', 'dark')
+    }
+  }, [isLight])
+
+  useEffect(() => {
+    const onResize = () => { if (window.innerWidth > 670) setIsNavOpen(false) }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
   return (
     <>
       <div className="fs-page">
-        <Header />
+        <Header
+          isNavOpen={isNavOpen}
+          setIsNavOpen={setIsNavOpen}
+          isLight={isLight}
+          setIsLight={setIsLight}
+        />
+
+        <MenuMobile
+          isNavOpen={isNavOpen}
+          setIsNavOpen={setIsNavOpen}
+          isLight={isLight}
+          setIsLight={setIsLight}
+        />
 
         <main className="fs-hero">
           <div className="bg-orb orb-1" aria-hidden="true"></div>
@@ -56,7 +90,7 @@ function App() {
               </article>
 
               <article className="movie-card">
-                <div className="poster poster-alt"></div>
+                <div className="poster "></div>
                 <div className="card-body">
                   <h4 className="movie-title">Past Lives</h4>
                   <p className="movie-meta">Romance/Drama • 2023</p>
@@ -65,7 +99,7 @@ function App() {
               </article>
 
               <article className="movie-card">
-                <div className="poster poster-blue"></div>
+                <div className="poster "></div>
                 <div className="card-body">
                   <h4 className="movie-title">Dune: Part Two</h4>
                   <p className="movie-meta">Sci‑Fi • 2024</p>
@@ -74,7 +108,7 @@ function App() {
               </article>
 
               <article className="movie-card">
-                <div className="poster poster-purple"></div>
+                <div className="poster "></div>
                 <div className="card-body">
                   <h4 className="movie-title">Spider‑Verse</h4>
                   <p className="movie-meta">Animación • 2023</p>
@@ -83,7 +117,7 @@ function App() {
               </article>
 
               <article className="movie-card">
-                <div className="poster poster-red"></div>
+                <div className="poster "></div>
                 <div className="card-body">
                   <h4 className="movie-title">Oppenheimer</h4>
                   <p className="movie-meta">Biografía • 2023</p>
@@ -92,7 +126,7 @@ function App() {
               </article>
 
               <article className="movie-card">
-                <div className="poster poster-green"></div>
+                <div className="poster "></div>
                 <div className="card-body">
                   <h4 className="movie-title">Poor Things</h4>
                   <p className="movie-meta">Comedia • 2023</p>
@@ -103,9 +137,7 @@ function App() {
           </section>
         </main>
 
-        <footer className="fs-footer">
-          <p>© {new Date().getFullYear()} Film Search — Proyecto de Francisco G. — Cine para todos.</p>
-        </footer>
+        <Footer />
       </div>
     </>
   )

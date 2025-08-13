@@ -145,14 +145,8 @@ body {
 }
 .poster {
   aspect-ratio: 2/3;
-  background: linear-gradient(135deg, #2a2f45, #1f2437);
+  background: linear-gradient(135deg, #144c3e, #0c2b24);
 }
-.poster-alt { background: linear-gradient(135deg, #29324e, #3e274e); }
-.poster-blue { background: linear-gradient(135deg, #183a6b, #0e234a); }
-.poster-purple { background: linear-gradient(135deg, #3b2a6b, #24154a); }
-.poster-red { background: linear-gradient(135deg, #5a1f2a, #2f0b11); }
-.poster-green { background: linear-gradient(135deg, #144c3e, #0c2b24); }
-
 /* Shimmer loading effect */
 .shimmer {
   position: relative; overflow: hidden;
@@ -161,7 +155,7 @@ body {
   content: ""; position: absolute; inset: 0;
   background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,.08) 30%, transparent 60%);
   transform: translateX(-100%);
-  animation: shimmer 2.2s infinite;
+  animation: shimmer 3s infinite;
 }
 @keyframes shimmer {
   0% { transform: translateX(-100%); }

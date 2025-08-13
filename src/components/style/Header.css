@@ -42,6 +42,10 @@
 }
 
 .header-actions {
+    display: none;
+}
+
+.header-actions-desktop {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -170,35 +174,56 @@
 }
 .menu-icon { width: 18px; height: 18px; }
 
+/* Nav de escritorio (dentro del header) */
+.header-actions-desktop {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 /* Panel desplegable en móvil */
 @media (max-width: 670px) {
+    .header-actions-desktop { display: none; }
     .menu-toggle { display: inline-flex; }
 
+    /* Panel móvil FIXED con blur (sin anidar dentro del header) */
     .header-actions {
-        position: absolute;
-        top: calc(100% + 8px);
+        display: flex;
+        position: fixed;
+        top: 92px; /* altura aproximada del header */
         right: clamp(12px, 4vw, 24px);
         left: clamp(12px, 4vw, 24px);
         flex-direction: column;
         gap: 10px;
         padding: 12px;
-        background: linear-gradient(180deg, var(--panel-strong), var(--panel));
-        border: 1px solid var(--border);
+        border: 1px solid rgba(255,255,255,.18);
         border-radius: 12px;
-        box-shadow: var(--shadow);
+        box-shadow: 0 14px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
         max-height: 0;
         overflow: hidden;
         opacity: 0;
         pointer-events: none;
         transform: translateY(-6px);
-        z-index: 30;
-        backdrop-filter: blur(10px);
+        z-index: 1000;
+        background: linear-gradient(180deg, rgba(20,22,28,.58), rgba(20,22,28,.46));
+        -webkit-backdrop-filter: blur(20px) saturate(1.2);
+        backdrop-filter: blur(20px) saturate(1.2);
+        transition: max-height .3s ease, opacity .3s ease, transform .3s ease;
     }
     .header-actions.open {
         max-height: 500px;
         opacity: 1;
         pointer-events: auto;
         transform: translateY(0);
+    }
+
+    /* Variante clara del panel móvil */
+    .theme-light .header-actions {
+        background: linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.72));
+        border-color: rgba(0,0,0,.12);
+        box-shadow: 0 14px 40px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.9);
+        -webkit-backdrop-filter: blur(20px) saturate(1.3);
+        backdrop-filter: blur(20px) saturate(1.3);
     }
 
     /* Botones del panel a ancho completo */
