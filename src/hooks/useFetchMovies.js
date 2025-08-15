@@ -10,9 +10,10 @@ export function useFetchMovies(endpoint, query = "") {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Early return: si no hay término de búsqueda, evita llamar a la API.
-        // Deja de cargar y conserva (o limpia) los estados según convenga.
-        if (!query) {
+        const isSearch = endpoint.startsWith('search/');
+
+        // Si es búsqueda y no hay query, no llamar a la API.
+        if (isSearch && !query) {
             setLoading(false);
             // Opcional: mantener resultados previos o limpiarlos
             // setMovies([]);
@@ -20,32 +21,21 @@ export function useFetchMovies(endpoint, query = "") {
             return;
         }
 
-        // Construcción de la URL con:
-        // - endpoint dinámico (p. ej., 'search/movie')
-        // - API_KEY desde variables de entorno
-        // - language forzado a 'es-ES'
-        // - query codificada
         const API_KEY = import.meta.env.VITE_TMDB_KEY;
-        const URL = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(query)}`;
+        const baseURL = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=es-ES`;
+        const URL = isSearch
+            ? `${baseURL}&query=${encodeURIComponent(query)}`
+            : baseURL;
 
-        // Secuencia de fetch:
-        // 1) Activa loading
-        // 2) Valida respuesta HTTP
-        // 3) Parsea JSON y guarda resultados
-        // 4) Maneja errores y limpia estados al finalizar
         setLoading(true);
         fetch(URL)
             .then(res => {
                 if (!res.ok) throw new Error("Error en la petición");
-                // Opcional: logs de diagnóstico
-                // console.log(res);
                 return res.json();
             })
             .then(data => {
                 setMovies(data.results || []);
                 setError(null);
-                // Opcional: logs de diagnóstico
-                // console.log(data.results);
             })
             .catch(err => setError(err.message))
             .finally(() => setLoading(false));

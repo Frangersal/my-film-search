@@ -12,13 +12,32 @@ function App() {
   // Pruebas API
   const [searchInput, setSearchInput] = useState("")
   const [query, setQuery] = useState("")
-  const { movies, loading, error } = useFetchMovies("search/movie", query)
+  // Nuevo: control de feed (popular | search | trending | top_rated) y ventana de tiempo para tendencias
+  const [feed, setFeed] = useState('popular')
+  const [timeWindow] = useState('day') // 'day' o 'week'
 
-  // Manejo del envío: valida entrada vacía y sincroniza 'query' con el input para disparar la búsqueda.
+  // Elegir endpoint según feed
+  const endpoint =
+    feed === 'search' ? 'search/movie'
+    : feed === 'trending' ? `trending/all/${timeWindow}`
+    : feed === 'top_rated' ? 'movie/top_rated'
+    : 'movie/popular'
+
+  const { movies, loading, error } = useFetchMovies(endpoint, query)
+
+  // Manejo del envío: valida entrada, actualiza query y cambia feed a 'search'
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!searchInput.trim()) return
+    setFeed('search')
     setQuery(searchInput.trim())
+  }
+
+  // Handler para seleccionar feeds desde el Header
+  const handleSelectFeed = (nextFeed) => {
+    setFeed(nextFeed)
+    setQuery('')         // limpiar búsqueda
+    setSearchInput('')   // limpiar input
   }
 
   // Base para construir URLs de pósters de TMDb (tamaño w342).
@@ -60,17 +79,61 @@ function App() {
     .map(movie => {
       // URL del póster (null si no existe 'poster_path').
       const posterUrl = movie.poster_path ? `${IMG_BASE}${movie.poster_path}` : null
-      // Título seguro para usar en accesibilidad y textos (fallback '—').
-      const safeTitle = movie.title || '—'
-      // Título truncado a 40 caracteres con "..." para evitar desbordes visuales.
+      // Título: soporta películas (title) y TV (name)
+      const safeTitle = movie.title || movie.name || '—'
+      // Título truncado a 40 caracteres con "..."
       const displayTitle = safeTitle.length > 40 ? `${safeTitle.slice(0, 40)}...` : safeTitle
-      // Año (YYYY) extraído de 'release_date' o '—' si no está disponible.
-      const year = movie.release_date ? movie.release_date.slice(0, 4) : '—'
-      // Puntuación: máximo 1 decimal; si no hay calificación (> 0), muestra '0'.
+      // Año: de release_date (pelis) o first_air_date (TV)
+      const rawDate = movie.release_date || movie.first_air_date || ''
+      const year = rawDate ? rawDate.slice(0, 4) : '—'
+      // Puntuación
       const hasRating = Number.isFinite(movie.vote_average) && movie.vote_average > 0
       const rating = hasRating ? +movie.vote_average.toFixed(1) : '0'
       return { id: movie.id, posterUrl, safeTitle, displayTitle, year, rating }
     })
+
+  // Título de sección según feed
+  const sectionTitle =
+    feed === 'search' && query ? 'Resultados de la búsqueda'
+    : feed === 'trending' ? 'Tendencias'
+    : feed === 'top_rated' ? 'Mejor valoradas'
+    : 'Populares esta semana'
+
+  // Nuevo: determina si no hay resultados que mostrar para la búsqueda actual.
+  const noResults = !loading && !error && feed === 'search' && Boolean(query) && uiMovies.length === 0
+
+  // Tarjetas ya listas para renderizar
+  const uiCards = uiMovies.map(m => (
+    <article className="movie-card" key={m.id}>
+      <div className="poster">
+        {m.posterUrl ? (
+          <img
+            className="poster-img"
+            src={m.posterUrl}
+            alt={`Póster de ${m.safeTitle}`}
+            loading="lazy"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+        ) : null}
+      </div>
+      <div className="card-body">
+        <h4 className="movie-title">{m.displayTitle}</h4>
+        <p className="movie-meta">Genero • {m.year}</p>
+      </div>
+      <span className="badge">{m.rating}</span>
+    </article>
+  ))
+
+  // Contenido de resultados (mensaje vacío o grilla con tarjetas).
+  const resultsContent = noResults
+    ? <p className="empty-state">Lo sentimos, no se ha encontrado nada...</p>
+    : (
+      <div className="card-grid">
+        {/* Comienzo - Pruebas de renderizado de las peliculas */}
+        {uiCards}
+        {/* Fin - Pruebas de renderizado de las peliculas */}
+      </div>
+    )
 
   return (
     <>
@@ -80,6 +143,7 @@ function App() {
           setIsNavOpen={setIsNavOpen}
           isLight={isLight}
           setIsLight={setIsLight}
+          onSelectFeed={handleSelectFeed} // nuevo: pasar handler al Header
         />
 
         <MenuMobile
@@ -116,61 +180,22 @@ function App() {
               <button type="submit" className="search-btn">Buscar</button>
             </div>
 
+            {/* 
+            No se me ocurrio como incluirlo, pero seguire pensando... 
             <div className="chips" aria-label="Sugerencias rápidas">
               <button type="button" className="chip">Acción</button>
               <button type="button" className="chip">Drama</button>
               <button type="button" className="chip">Comedia</button>
               <button type="button" className="chip">Ciencia ficción</button>
               <button type="button" className="chip">Animación</button>
-            </div>
+            </div> */}
+
           </form>
-          {loading && <p>Cargando...</p>}
-          {error && <p>Error: {error}</p>}
+          {/* {loading && <p>Cargando...</p>}
+          {error && <p>Error: {error}</p>} */}
           <section className="fs-suggestions" id="tendencias" aria-labelledby="tendencias-title">
-            <h3 className="section-title" id="tendencias-title">Populares esta semana</h3>
-            <div className="card-grid">
-
-              {/* <article className="movie-card">
-                <div className="poster shimmer"></div>
-                <div className="card-body">
-                  <h4 className="movie-title">The Night Agent</h4>
-                  <p className="movie-meta">Acción • 2023</p>
-                </div>
-                <span className="badge">8.4</span>
-              </article> */}
-
-              {/* Comienzo - Pruebas de renderizado de las peliculas */}
-              {uiMovies.map(m => {
-                return (
-                  <React.Fragment key={m.id}>
-                    <article className="movie-card">
-                      <div className="poster">
-                        {m.posterUrl ? (
-                          <img
-                            className="poster-img"
-                            src={m.posterUrl}
-                            alt={`Póster de ${m.safeTitle}`}
-                            loading="lazy"
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                          />
-                        ) : null}
-                      </div>
-                      <div className="card-body">
-                        <h4 className="movie-title">{m.displayTitle}</h4>
-                        <p className="movie-meta">Genero • {m.year}</p>
-                      </div>
-                      <span className="badge">{m.rating}</span>
-                    </article>
-                  </React.Fragment>
-                )
-              })}
-              {/* Fin - Pruebas de renderizado de las peliculas */}
-
-
-
-
-
-            </div>
+            <h3 className="section-title" id="tendencias-title">{sectionTitle}</h3>
+            {resultsContent}
           </section>
         </main>
 
