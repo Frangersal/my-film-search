@@ -31,10 +31,12 @@ export function useFetchMovies(endpoint, query = "") {
         fetch(URL)
             .then(res => {
                 if (!res.ok) throw new Error("Error en la petición");
+                console.log(res)
                 return res.json();
             })
             .then(data => {
                 setMovies(data.results || []);
+                console.log(data)
                 setError(null);
             })
             .catch(err => setError(err.message))

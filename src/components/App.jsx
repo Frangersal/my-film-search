@@ -1,6 +1,8 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
 import { useFetchMovies } from "../hooks/useFetchMovies";
+import 'bootstrap/dist/css/bootstrap.min.css' // Bootstrap CSS
+import ModalDetail from './ModalDetail'       // Componente del modal
 
 import Header from './Header'
 import MenuMobile from './MenuMobile'
@@ -68,6 +70,21 @@ function App() {
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
+  // Estado para el modal (película activa y visibilidad)
+  const [showModal, setShowModal] = useState(false)
+  const [activeMovie, setActiveMovie] = useState(null)
+
+  const handleOpenModal = (item) => {
+    setActiveMovie(item)
+    setShowModal(true)
+  }
+
+  // Este onClose lo invoca ModalDetail cuando el modal ya terminó de ocultarse
+  const handleCloseModal = () => {
+    setShowModal(false)
+    setActiveMovie(null)
+  }
+
   // Lógica previa al render: normaliza y formatea datos para la UI.
   const uiMovies = movies
     // Filtra: si no hay póster y tampoco hay calificación (> 0), no se renderiza.
@@ -89,7 +106,14 @@ function App() {
       // Puntuación
       const hasRating = Number.isFinite(movie.vote_average) && movie.vote_average > 0
       const rating = hasRating ? +movie.vote_average.toFixed(1) : '0'
-      return { id: movie.id, posterUrl, safeTitle, displayTitle, year, rating }
+      // Datos completos para el modal
+      const fullDate = movie.release_date || movie.first_air_date || ''
+      const overview = movie.overview || ''
+      return {
+        id: movie.id,
+        posterUrl, safeTitle, displayTitle, year, rating,
+        fullDate, overview
+      }
     })
 
   // Título de sección según feed
@@ -104,7 +128,15 @@ function App() {
 
   // Tarjetas ya listas para renderizar
   const uiCards = uiMovies.map(m => (
-    <article className="movie-card" key={m.id}>
+    <article
+      className="movie-card"
+      key={m.id}
+      onClick={() => handleOpenModal(m)}
+      role="button"
+      tabIndex={0}
+      title={`Ver detalles de ${m.safeTitle}`}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleOpenModal(m) } }}
+    >
       <div className="poster">
         {m.posterUrl ? (
           <img
@@ -198,6 +230,13 @@ function App() {
             {resultsContent}
           </section>
         </main>
+
+        {/* Modal de detalle */}
+        <ModalDetail
+          show={showModal}
+          onClose={handleCloseModal}
+          item={activeMovie}
+        />
 
         <Footer />
       </div>
