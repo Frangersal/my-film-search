@@ -29,7 +29,7 @@ Finalmente el proyecto fue desplegado en netlify [My Film Search](https://myfilm
 <img src="/public/img/screenshot-search.png" alt="Resultados de búsqueda" />
 
 <!-- captura: modal abierto -->
-<img src="/public/img/ss-4-l" alt="Modal de detalle" />
+<img src="/public/img/ss-4-l.png" alt="Modal de detalle" />
 
 ## Tecnologías 🎥
 
