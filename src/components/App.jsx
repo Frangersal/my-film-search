@@ -85,6 +85,14 @@ function App() {
     setActiveMovie(null)
   }
 
+  // Helper: convierte 'aaaa-mm-dd' a 'dd/mm/aaaa'
+  const formatDate = (iso) => {
+    if (!iso || typeof iso !== 'string') return '—'
+    const [y, m, d] = iso.split('-')
+    if (!y || !m || !d) return '—'
+    return `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`
+  }
+
   // Lógica previa al render: normaliza y formatea datos para la UI.
   const uiMovies = movies
     // Filtra: si no hay póster y tampoco hay calificación (> 0), no se renderiza.
@@ -106,8 +114,8 @@ function App() {
       // Puntuación
       const hasRating = Number.isFinite(movie.vote_average) && movie.vote_average > 0
       const rating = hasRating ? +movie.vote_average.toFixed(1) : '0'
-      // Datos completos para el modal
-      const fullDate = movie.release_date || movie.first_air_date || ''
+      // Datos completos para el modal (fecha formateada dd/mm/aaaa)
+      const fullDate = formatDate(rawDate)
       const overview = movie.overview || ''
       return {
         id: movie.id,
@@ -183,6 +191,7 @@ function App() {
           setIsNavOpen={setIsNavOpen}
           isLight={isLight}
           setIsLight={setIsLight}
+          onSelectFeed={handleSelectFeed} // nuevo: prop para seleccionar feed en móvil
         />
 
         <main className="fs-hero">
@@ -204,7 +213,7 @@ function App() {
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Buscar “Oppenheimer”, “Scorsese”, “Sci‑Fi”..."
+                placeholder="Buscar “Oppenheimer”, “El padrino”, etc..."
                 autoComplete="off"
                 className="search-input"
                 required

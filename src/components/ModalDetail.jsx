@@ -54,8 +54,8 @@ function ModalDetail({ show, onClose, item }) {
             role="dialog"
             aria-modal="true"
         >
-            <div className="modal-dialog modal-lg modal-dialog-centered">
-                <div className="modal-content">
+            <div className="modal-dialog modal-lg modal-dialog-centered fs-modal-dialog">
+                <div className="modal-content fs-modal">
                     <div className="modal-header">
                         <h5 className="modal-title">{title}</h5>
                         {/* Deja que Bootstrap cierre el modal; el evento hidden llamará onClose */}
