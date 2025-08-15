@@ -12,21 +12,24 @@ function App() {
   // Pruebas API
   const [searchInput, setSearchInput] = useState("")
   const [query, setQuery] = useState("")
-  const {movies, loading, error } = useFetchMovies("search/movie", query)
+  const { movies, loading, error } = useFetchMovies("search/movie", query)
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   // La búsqueda se actualiza automáticamente por el hook
-  // };
+  // Manejo del envío: valida entrada vacía y sincroniza 'query' con el input para disparar la búsqueda.
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!searchInput.trim()) return
     setQuery(searchInput.trim())
   }
-const IMG_BASE = 'https://image.tmdb.org/t/p/w342';
+
+  // Base para construir URLs de pósters de TMDb (tamaño w342).
+  const IMG_BASE = 'https://image.tmdb.org/t/p/w342';
   // Fin Pruebas API
+
+  // Tema oscuro/claro
   const [isNavOpen, setIsNavOpen] = useState(false)
   const [isLight, setIsLight] = useState(() => localStorage.getItem('theme') === 'light')
+
+  // Sincroniza el tema con la clase del <html> y persiste en localStorage.
   useEffect(() => {
     const root = document.documentElement
     if (isLight) {
@@ -37,14 +40,37 @@ const IMG_BASE = 'https://image.tmdb.org/t/p/w342';
       localStorage.setItem('theme', 'dark')
     }
   }, [isLight])
+  // Tema oscuro/claro
 
+  // Cierra el menú móvil automáticamente si pasa a viewport de escritorio (> 670px).
   useEffect(() => {
     const onResize = () => { if (window.innerWidth > 670) setIsNavOpen(false) }
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
-
+  // Lógica previa al render: normaliza y formatea datos para la UI.
+  const uiMovies = movies
+    // Filtra: si no hay póster y tampoco hay calificación (> 0), no se renderiza.
+    .filter(movie => {
+      const hasPoster = Boolean(movie.poster_path)
+      const hasRating = Number.isFinite(movie.vote_average) && movie.vote_average > 0
+      return hasPoster || hasRating
+    })
+    .map(movie => {
+      // URL del póster (null si no existe 'poster_path').
+      const posterUrl = movie.poster_path ? `${IMG_BASE}${movie.poster_path}` : null
+      // Título seguro para usar en accesibilidad y textos (fallback '—').
+      const safeTitle = movie.title || '—'
+      // Título truncado a 40 caracteres con "..." para evitar desbordes visuales.
+      const displayTitle = safeTitle.length > 40 ? `${safeTitle.slice(0, 40)}...` : safeTitle
+      // Año (YYYY) extraído de 'release_date' o '—' si no está disponible.
+      const year = movie.release_date ? movie.release_date.slice(0, 4) : '—'
+      // Puntuación: máximo 1 decimal; si no hay calificación (> 0), muestra '0'.
+      const hasRating = Number.isFinite(movie.vote_average) && movie.vote_average > 0
+      const rating = hasRating ? +movie.vote_average.toFixed(1) : '0'
+      return { id: movie.id, posterUrl, safeTitle, displayTitle, year, rating }
+    })
 
   return (
     <>
@@ -67,7 +93,7 @@ const IMG_BASE = 'https://image.tmdb.org/t/p/w342';
           <div className="bg-orb orb-1" aria-hidden="true"></div>
           <div className="bg-orb orb-2" aria-hidden="true"></div>
 
-          <h2 className="hero-title">Encuentra tu próxima película</h2>
+          <h2 className="hero-title">Encuentra tu próxima película o serie de tv</h2>
           <p className="hero-subtitle">Busca por título, director o género. Descubre joyas ocultas y estrenos imperdibles.</p>
 
           <form className="fs-search" role="search" onSubmit={handleSubmit}>
@@ -102,36 +128,8 @@ const IMG_BASE = 'https://image.tmdb.org/t/p/w342';
           {error && <p>Error: {error}</p>}
           <section className="fs-suggestions" id="tendencias" aria-labelledby="tendencias-title">
             <h3 className="section-title" id="tendencias-title">Populares esta semana</h3>
-
-
-            {/* Comienzo - Pruebas de renderizado de las peliculas */}
-            <ul>
-              {movies.map(movie => {
-                const posterUrl = movie.poster_path ? `${IMG_BASE}${movie.poster_path}` : null;
-                return (
-                  <React.Fragment key={movie.id}>
-                    <li>{movie.title} ({movie.release_date})</li>
-                    <li>
-                      {posterUrl ? (
-                        <img
-                          src={posterUrl}
-                          alt={`Póster de ${movie.title}`}
-                          width="170"
-                          height="255"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <span>Sin póster</span>
-                      )}
-                    </li>
-                  </React.Fragment>
-                );
-              })}
-            </ul>
-            {/* Fin - Pruebas de renderizado de las peliculas */}
-
-
             <div className="card-grid">
+
               {/* <article className="movie-card">
                 <div className="poster shimmer"></div>
                 <div className="card-body">
@@ -141,14 +139,36 @@ const IMG_BASE = 'https://image.tmdb.org/t/p/w342';
                 <span className="badge">8.4</span>
               </article> */}
 
-              <article className="movie-card">
-                <div className="poster "></div>
-                <div className="card-body">
-                  <h4 className="movie-title">Past Lives</h4>
-                  <p className="movie-meta">Romance/Drama • 2023</p>
-                </div>
-                <span className="badge">8.1</span>
-              </article>
+              {/* Comienzo - Pruebas de renderizado de las peliculas */}
+              {uiMovies.map(m => {
+                return (
+                  <React.Fragment key={m.id}>
+                    <article className="movie-card">
+                      <div className="poster">
+                        {m.posterUrl ? (
+                          <img
+                            className="poster-img"
+                            src={m.posterUrl}
+                            alt={`Póster de ${m.safeTitle}`}
+                            loading="lazy"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                          />
+                        ) : null}
+                      </div>
+                      <div className="card-body">
+                        <h4 className="movie-title">{m.displayTitle}</h4>
+                        <p className="movie-meta">Genero • {m.year}</p>
+                      </div>
+                      <span className="badge">{m.rating}</span>
+                    </article>
+                  </React.Fragment>
+                )
+              })}
+              {/* Fin - Pruebas de renderizado de las peliculas */}
+
+
+
+
 
             </div>
           </section>

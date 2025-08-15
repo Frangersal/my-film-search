@@ -143,6 +143,7 @@ body {
   border-color: rgba(255,255,255,.28);
   box-shadow: 0 16px 40px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08);
 }
+
 .poster {
   aspect-ratio: 2/3;
   background: linear-gradient(135deg, #144c3e, #0c2b24);
