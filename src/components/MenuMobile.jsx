@@ -1,6 +1,6 @@
 import './style/Header.css'
 
-function MenuMobile({ isNavOpen, setIsNavOpen, isLight, setIsLight }) {
+function MenuMobile({ isNavOpen, setIsNavOpen, isLight, setIsLight, onSelectFeed }) {
     return (
         <nav
             id="primary-nav"
@@ -8,8 +8,30 @@ function MenuMobile({ isNavOpen, setIsNavOpen, isLight, setIsLight }) {
             aria-label="Atajos"
             onClick={(e) => { if (e.target.tagName === 'A') setIsNavOpen(false) }}
         >
-            <a href="#tendencias" className="link">Tendencias</a>
-            <a href="#mejor-valoradas" className="link">Mejor valoradas</a>
+            {/* Tendencias -> trending */}
+            <a
+                href="#tendencias"
+                className="link"
+                onClick={(e) => {
+                    e.preventDefault()
+                    onSelectFeed && onSelectFeed('trending')
+                    setIsNavOpen(false)
+                }}
+            >
+                Tendencias
+            </a>
+            {/* Mejor valoradas -> top_rated */}
+            <a
+                href="#mejor-valoradas"
+                className="link"
+                onClick={(e) => {
+                    e.preventDefault()
+                    onSelectFeed && onSelectFeed('top_rated')
+                    setIsNavOpen(false)
+                }}
+            >
+                Mejor valoradas
+            </a>
             <a href="https://github.com/Frangersal/my-film-search" className="cta" target="_blank" rel="noreferrer">Repositorio</a>
             <button
                 type="button"
